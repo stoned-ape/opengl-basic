@@ -1,6 +1,4 @@
-#include <GLFW/glfw3.h>
 #include <stdio.h>
-#include <simd/simd.h>
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -13,6 +11,32 @@
 #include <ctype.h>
 #include <pthread.h>
 
+#ifdef __APPLE__
+
+#include <GLFW/glfw3.h>
+#include <simd/simd.h>
+typedef simd_float2 vec2;
+typedef simd_float3 vec3;
+typedef simd_float4 vec4;
+
+#elif
+
+typedef struct{
+    float x,y;
+}vec2;
+typedef struct{
+    float x,y,z;
+}vec3;
+typedef struct{
+    float x,y,z,w;
+}vec4;
+
+#endif
+
+void printv1(float v){ printf("%f \n",v);}
+void printv2(vec2  v){ printf("[ %f , %f ]\n",v.x,v.y);}
+void printv3(vec3  v){ printf("[ %f , %f , %f ]\n",v.x,v.y,v.z);}
+void printv4(vec4  v){ printf("[ %f , %f , %f , %f ]\n",v.x,v.y,v.z,v.w);}
 
 int ret;
 #define SYSCALL(call) \
@@ -24,13 +48,6 @@ if(ret==-1){ \
     exit(errno); \
 }
 
-typedef simd_float2 vec2;
-typedef simd_float3 vec3;
-typedef simd_float4 vec4;
-void printv1(float v){ printf("%f \n",v);}
-void printv2(vec2  v){ printf("[ %f , %f ]\n",v.x,v.y);}
-void printv3(vec3  v){ printf("[ %f , %f , %f ]\n",v.x,v.y,v.z);}
-void printv4(vec4  v){ printf("[ %f , %f , %f , %f ]\n",v.x,v.y,v.z,v.w);}
 
 typedef struct{
     int program_id;

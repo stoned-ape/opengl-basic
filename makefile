@@ -1,10 +1,13 @@
 all: game
 
+flags=-g -Wall -Wextra -fsanitize=address -fsanitize=undefined 
+glflags=-lglfw -framework OpenGL
+
 game: main.c makefile
-	clang -g -w -lglfw -framework OpenGL main.c -o game
+	clang $(flags) $(glflags) main.c -o game
 
 run: game
-	./game
+	./game -p
 	
 debug: game
 	lldb game

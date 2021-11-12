@@ -10,16 +10,21 @@
 #include <sys/time.h>
 #include <ctype.h>
 #include <pthread.h>
+#include <unistd.h>
+
 
 #ifdef __APPLE__
 
+#define GL_SILENCE_DEPRECATION
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <OpenGL/gl3.h>
 #include <simd/simd.h>
 typedef simd_float2 vec2;
 typedef simd_float3 vec3;
 typedef simd_float4 vec4;
 
-#elif
+#else
 
 typedef struct{
     float x,y;
@@ -98,7 +103,7 @@ int compile_shader(char *fname,bool vert){
     char *code=filemap(fname,&len);
     int shader=glCreateShader(vert?GL_VERTEX_SHADER:GL_FRAGMENT_SHADER);
     assert(shader);
-    glShaderSource(shader,1,&code,NULL);
+    glShaderSource(shader,1,(const GLchar *const*)&code,NULL);
     SYSCALL(munmap(code,len+1));
     glCompileShader(shader);
     int res;
@@ -107,7 +112,7 @@ int compile_shader(char *fname,bool vert){
         printf("compiler error in %s \n",fname);
         char infoLog[1024];
         glGetShaderInfoLog(shader,1024,NULL,infoLog);
-        printf(infoLog);
+        puts(infoLog);
         exit(3);
     }
     return shader;
@@ -126,7 +131,7 @@ int makeprogram(char *vert,char *frag){
         printf("linker error \n");
         char infolog[1024];
         glGetProgramInfoLog(program_id,1024,NULL,infolog);
-        printf(infolog);
+        puts(infolog);
         exit(4);
     }
     return program_id;
@@ -143,6 +148,9 @@ float itime(){
 //mods: assigns a number to modifier keys like shift, control, and option
 //action: GLFW_PRESS=1, GLFW_RELEASE=0 or GLFW_REPEAT=2
 void key_callback(GLFWwindow* window,int key,int scancode,int action,int mods){
+    (void)window;
+    (void)scancode;
+    (void)mods;
     switch(action){
         case GLFW_PRESS:   uni.keydown[key]=true ;break;
         case GLFW_REPEAT:  uni.keydown[key]=true ;break;
@@ -151,6 +159,8 @@ void key_callback(GLFWwindow* window,int key,int scancode,int action,int mods){
 }
 
 void mouse_callback(GLFWwindow* window,int button,int action,int mods){
+    (void)window;
+    (void)mods;
     bool *mouse=button?&uni.rightmousedown:&uni.leftmousedown;
     switch(action){
         case GLFW_PRESS:   *mouse=true ;break;
@@ -218,7 +228,7 @@ GLFWwindow *setup_window(int w,int h){
 }
 
 void setup_vertecies(){
-    int vtxarray_id;
+    GLuint vtxarray_id;
     glGenVertexArrays(1, &vtxarray_id);
     glBindVertexArray(vtxarray_id);
     static vec4 vtx_data[]={
@@ -227,7 +237,7 @@ void setup_vertecies(){
         {-1, 1,0,0},
         { 1, 1,0,0}
     };
-    int vtxbuff_id;
+    GLuint vtxbuff_id;
     glGenBuffers(1,&vtxbuff_id);
     glBindBuffer(GL_ARRAY_BUFFER,vtxbuff_id);
     glBufferData(GL_ARRAY_BUFFER,sizeof(vtx_data),vtx_data,GL_STATIC_DRAW);

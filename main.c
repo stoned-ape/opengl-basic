@@ -80,7 +80,6 @@ void mouse_callback(GLFWwindow*,int,int,int);
 void uniforms_init(uniforms*,int,int);
 void uniforms_set(uniforms*);
 void print_fps();
-void random_hints();
 GLFWwindow *setup_window(int,int);
 void setup_vertecies();
 
@@ -209,17 +208,14 @@ void print_fps(){
     fflush(stdout);
 }
 
-void random_hints(){
+
+GLFWwindow *setup_window(int w,int h){
+    if(!glfwInit()) exit(1);
     glfwWindowHint(GLFW_SAMPLES,4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
-}
-
-GLFWwindow *setup_window(int w,int h){
-    if(!glfwInit()) exit(1);
-    random_hints();
     GLFWwindow *win=glfwCreateWindow(w,h,".____.",NULL,NULL);
     if(!win) exit(2);
     glfwMakeContextCurrent(win);
